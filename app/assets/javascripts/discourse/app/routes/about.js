@@ -1,17 +1,19 @@
+import { service } from "@ember/service";
 import { ajax } from "discourse/lib/ajax";
 import Category from "discourse/models/category";
-import Site from "discourse/models/site";
 import DiscourseRoute from "discourse/routes/discourse";
 import I18n from "discourse-i18n";
 
 export default DiscourseRoute.extend({
+  site: service(),
+
   async model() {
     const result = await ajax("/about.json");
     const users = Object.fromEntries(
       result.users.map((user) => [user.id, user])
     );
     result.categories?.forEach((category) => {
-      Site.current().updateCategory(category);
+      this.site.updateCategory(category);
     });
 
     const yearAgo = moment().locale("en").utc().subtract(1, "year");
